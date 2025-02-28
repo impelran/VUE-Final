@@ -17,6 +17,7 @@
             <img v-if="item.imageUrl" :src="item.imageUrl" alt="News Image" class="news-image">
             <p v-html="item.description"></p>
         </div>
+        <router-link :to="{ path: `/news/${feedIndex}/${index}` }">View Details</router-link>
 
       </div>
     </div>
@@ -43,17 +44,9 @@ export default {
       newsItems: [],
       loading: false,
       error: null,
-      limit: '10',  // Default limit
+      limit: '10',
         displayedNews : []
     };
-  },
-  computed: {
-      /*
-    displayedNews() {
-        if(this.newsItems.length === 0) return []
-      const limit = this.limit === 'all' ? this.newsItems.length : parseInt(this.limit, 10);
-      return this.newsItems.slice(0, limit);
-    },*/
   },
   watch:{
       limit(){

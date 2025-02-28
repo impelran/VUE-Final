@@ -1,7 +1,6 @@
 <template>
   <div>
     <h2>RSS Feeds</h2>
-    <RssForm @save="addOrUpdateFeed" :formTitle="formTitle" :feed="selectedFeed"/>
     <ul>
       <li v-for="(feed, index) in feeds" :key="index">
         <span @click="showNews(index)" class="feed-link">{{ feed.title }}</span>
@@ -29,7 +28,6 @@ export default {
     };
   },
   created() {
-    // Load feeds from localStorage
     const savedFeeds = localStorage.getItem('rssFeeds');
     if (savedFeeds) {
       this.feeds = JSON.parse(savedFeeds);
@@ -46,9 +44,7 @@ export default {
   methods: {
     addOrUpdateFeed(newFeed) {
       if(this.selectedFeed.title !=="" && this.selectedFeed.url !==""){
-          //Find index of specific object using findIndex method.
           const objIndex = this.feeds.findIndex((obj => obj.title === this.selectedFeed.title && obj.url === this.selectedFeed.url));
-          //Update object's name property.
           this.feeds[objIndex].title = newFeed.title
           this.feeds[objIndex].url = newFeed.url
           this.selectedFeed = { title: '', url: '' }
@@ -57,10 +53,10 @@ export default {
       }else{
           this.feeds.push(newFeed);
       }
+        this.$router.push(`/`);
     },
       editFeed(index){
-        this.selectedFeed = this.feeds[index]
-          this.formTitle = "Edit Rss Feed"
+          this.$router.push({ path: '/add-feed', query: { index } });
       },
       deleteFeed(index) {
           if (confirm('Are you sure you want to delete this feed?')) {
@@ -68,7 +64,7 @@ export default {
           }
       },
     showNews(index) {
-      this.$router.push(`/news/${index}`); // Navigate to the news page
+      this.$router.push(`/news/${index}`);
     },
   },
 };

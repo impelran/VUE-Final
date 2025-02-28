@@ -1,6 +1,5 @@
-// rssService.js
 export async function parseRssFeed(url) {
-    const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"; // Use a CORS proxy
+    const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
     try {
         const response = await fetch(CORS_PROXY + url);
@@ -19,19 +18,16 @@ export async function parseRssFeed(url) {
             let description = item.querySelector("description")?.textContent;
             let imageUrl = null
 
-            //Try to find image inside description
             if(description){
                 const doc = new DOMParser().parseFromString(description, "text/html");
                 const img = doc.querySelector('img');
                 if(img){
-                    imageUrl = img.getAttribute('src')
-                    // Remove the image from the description
+                    imageUrl = img.getAttribute('src')  
                     img.remove();
                     description = doc.body.innerHTML
                 }
             }
 
-            // If not image found, try to get enclosure
             if(!imageUrl){
                 const enclosure = item.querySelector("enclosure");
                 if (enclosure) {
@@ -50,6 +46,6 @@ export async function parseRssFeed(url) {
         return newsItems;
     } catch (error) {
         console.error("Error parsing RSS feed:", error);
-        throw error;  // Re-throw the error so the calling function can handle it
+        throw error;
     }
 }
