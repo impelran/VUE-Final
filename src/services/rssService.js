@@ -1,51 +1,57 @@
 export async function parseRssFeed(url) {
-    const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
-
     try {
-        const response = await fetch(CORS_PROXY + url);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            },
+        });
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
         }
+
         const text = await response.text();
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(text, "text/xml");
-        const items = xmlDoc.querySelectorAll("item");
-        const newsItems = [];
+        return extractData(xmlDoc);
 
-        items.forEach(item => {
-            const title = item.querySelector("title")?.textContent;
-            const link = item.querySelector("link")?.textContent;
-            let description = item.querySelector("description")?.textContent;
-            let imageUrl = null
-
-            if(description){
-                const doc = new DOMParser().parseFromString(description, "text/html");
-                const img = doc.querySelector('img');
-                if(img){
-                    imageUrl = img.getAttribute('src')  
-                    img.remove();
-                    description = doc.body.innerHTML
-                }
-            }
-
-            if(!imageUrl){
-                const enclosure = item.querySelector("enclosure");
-                if (enclosure) {
-                    imageUrl = enclosure.getAttribute('url')
-                }
-            }
-
-            newsItems.push({
-                title,
-                link,
-                description,
-                imageUrl
-            });
-        });
-
-        return newsItems;
     } catch (error) {
-        console.error("Error parsing RSS feed:", error);
+        console.error('Error fetching or parsing RSS feed:', error);
         throw error;
     }
+}
+
+function extractData(xmlDoc) {
+    const items = xmlDoc.querySelectorAll('item');
+    const newsItems = [];
+
+    items.forEach(item => {
+        const title = item.querySelector('title')?.textContent;
+        const link = item.querySelector('link')?.textContent;
+        const description = item.querySelector('description')?.textContent;
+        const pubDate = item.querySelector('pubDate')?.textContent;
+        let image = null;
+        const enclosure = item.querySelector('enclosure[url]');
+        const mediaContent = item.querySelector('media\\:content[url]');
+        const mediaThumbnail = item.querySelector('media\\:thumbnail[url]');
+
+        if (enclosure) {
+            image = enclosure.getAttribute('url');
+        } else if (mediaContent) {
+            image = mediaContent.getAttribute('url');
+        } else if (mediaThumbnail) {
+            image = mediaThumbnail.getAttribute('url');
+        }
+
+        newsItems.push({
+            title,
+            link,
+            description,
+            pubDate,
+            imageUrl: image
+        });
+    });
+    return newsItems;
 }

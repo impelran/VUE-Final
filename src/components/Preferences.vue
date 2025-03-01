@@ -78,14 +78,6 @@
           if(savedFeeds){
               this.feeds = JSON.parse(savedFeeds)
           }
-        const saved = localStorage.getItem('savedNews');
-  
-        if (saved) {
-            let savedNews =  JSON.parse(saved)
-            this.savedNews = savedNews.filter(savedNewsItem => {
-                return this.feeds.some(feed => feed.url === savedNewsItem.feedUrl);
-            });
-        }
       },
         loadFeedPreferences(){
             const savedFeedsPref = localStorage.getItem('savedFeedPreferences');

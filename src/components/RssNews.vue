@@ -22,7 +22,7 @@
       </div>
     </div>
       <div v-if="!loading && displayedNews.length === 0">
-        No news available
+         No news available
       </div>
   </div>
 </template>
@@ -72,20 +72,20 @@ export default {
           }
       },
         async fetchNews() {
-            this.loading = true;
-            this.error = null;
-            this.newsItems = [];
+          this.loading = true;
+          this.error = null;
+          this.newsItems = [];
 
-            try {
-                this.newsItems = await parseRssFeed(this.feed.url);
-                const limit = this.limit === 'all' ? this.newsItems.length : parseInt(this.limit, 10);
-                this.displayedNews =  this.newsItems.slice(0, limit);
-            } catch (err) {
-                this.error = 'Failed to fetch news: ' + err.message;
-                console.error(err);
-            } finally {
-                this.loading = false;
-            }
+          try {
+              this.newsItems = await parseRssFeed(this.feed.url);
+              const limit = this.limit === 'all' ? this.newsItems.length : parseInt(this.limit, 10);
+              this.displayedNews =  this.newsItems.slice(0, limit);
+          } catch (err) {
+              this.error = 'Failed to fetch news: ' + err.message;
+              console.error(err);
+          } finally {
+              this.loading = false;
+          }
         }
     }
 };
